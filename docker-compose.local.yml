@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  # 1️⃣ LocalStack (S3 only)
+  localstack:
+    image: localstack/localstack:3.0
+    volumes:
+      - ./init:/init
+    environment:
+      - SERVICES=s3
+    ports:
+      - "4566:4566"          # S3 endpoint
+    healthcheck:
+      test: ["CMD", "awslocal", "s3", "ls"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2️⃣ API container
+  api:
+    build: .
+    image: loyalty-discount-api
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      AWS_S3_ENDPOINT: http://localstack:4566
+      AWS_REGION: ap-southeast-2
+      AWS_ACCESS_KEY_ID: dummy        # LocalStack accepts any string
+      AWS_SECRET_ACCESS_KEY: dummy
+      RULES_BUCKET: rules-test
+    ports:
+      - "8080:8080"

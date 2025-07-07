@@ -1,0 +1,101 @@
+openapi: 3.0.3
+info:
+  title: Loyalty Discount API
+  description: >-
+    Looks up the conversion rate (USD) and loyalty discount percentage based on
+    country, state, city, loyalty tier and period.  Business rules live in an Excel decision-table that is
+    compiled into Drools at runtime.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/loyalty/discount:
+    post:
+      tags:
+        - LoyaltyDiscount
+      summary: Get the loyalty discount based on country, state, city, loyalty tier and period
+      operationId: getLoyaltyDiscount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoyaltyRequest'
+      responses:
+        '200':
+          description: Flight number found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoyaltyResponse'
+        '400':
+          description: Invalid request (missing or malformed fields)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: No rule matched
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Conflict / duplicate / business error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+components:
+  schemas:
+    LoyaltyRequest:
+      type: object
+      required: [country, state, city, loyaltyTier, loyaltyPeriod]
+      properties:
+        country:
+          type: string
+          example: AU
+          description: Country code (2 uppercase letters)
+        state:
+          type: string
+          example: NSW
+          description: State code (2-3 uppercase letters)
+        city:
+          type: string
+          example: SYD
+          description: City Code (3 uppercase letters)
+        loyaltyTier:
+          type: string
+          example: BRZ
+          description: Loyalty tier code (3 uppercase letters)
+        loyaltyPeriod:
+          type: string
+          example: 1
+          description: Loyalty period (in years)
+
+    LoyaltyResponse:
+      type: object
+      required: [conversionRateUSD, discountPercentage]
+      properties:
+        conversionRateUSD:
+          type: string
+          example: 1
+          description: Conversion rate to USD
+        discountPercentage:
+          type: string
+          example: 0.5
+          description: Discount percentage
+    ErrorResponse:
+      type: object
+      required: [timestamp, status, error, message, path]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        message:
+          type: string
+          example: departure must not be blank

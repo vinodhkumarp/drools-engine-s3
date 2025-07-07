@@ -1,0 +1,13 @@
+aws:
+  region: ap-southeast-2
+  s3:
+    bucket: drools-engine-rules-bucket
+    prefix: rules/loyalty-discount-rules     # timestamped files
+    aliasKey: rules/loyalty-discount-rules-latest.xlsx
+
+rules:
+  poll-ms: 60000
+
+spring:
+  application:
+    name: loyalty-discount-api

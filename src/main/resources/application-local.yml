@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+aws:
+  region: ${AWS_REGION}
+  endpoint: ${AWS_S3_ENDPOINT}
+  accessKey: ${AWS_ACCESS_KEY_ID}
+  secretKey: ${AWS_SECRET_ACCESS_KEY}
+  s3:
+    bucket: ${RULES_BUCKET}
+    prefix: rules/loyalty-discount-rules-
+    aliasKey: rules/loyalty-discount-rules-latest.xlsx
+
+rules:
+  poll-ms: 5000
